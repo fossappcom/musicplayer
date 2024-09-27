@@ -1,4 +1,6 @@
-class MusicPlayer{
+import {join} from "./utils.mjs"
+
+export default class MusicPlayer{
     constructor(config){
 
         this.timePlayed = 0
@@ -8,10 +10,14 @@ class MusicPlayer{
         this.playlistPlayingIndex = 0
 
         this.serverList = {}
-
+        
         const serverList = localStorage.getItem('serverList')
         if(serverList){
             this.serverList = JSON.parse(serverList)
+        }
+
+        if(config.hooks){
+            this.hooks = config.hooks
         }
         
         if(config.elements){
@@ -79,9 +85,15 @@ class MusicPlayer{
             this.songSliderEl?.addEventListener('input', () => {
                 this.timePlayedEl.textContent = this.timePlayed
             })
+
+            this.audioEl.addEventListener('play', (e) => {
+                this.hooks?.onSongStart(this)
+            })
     
             this.audioEl.addEventListener('ended', (e) => {
-                if(this.playlist.songs.length > 1){
+                this.hooks?.onSongEnd(this)
+                
+                if(this.playlist.songs.length > this.playlistPlayingIndex){
                     this.playlistPlayingIndex++
                     const songIndex = this.playlistPlayingIndex
                     const nextSongPath = this.playlist.songs[songIndex]
@@ -104,36 +116,21 @@ class MusicPlayer{
         return text.replace("-", " - ").replaceAll("_", " ").replace('.flac', "")
     }
 
-    static extractArtistAlbumSongname(text){
-        const splitPath = text.split('/')
-
-        let [artist, album] = splitPath.at(-2).split('-')
-        artist = artist.replaceAll("_", " ")
-        album = album.replaceAll("_", " ")
-
-        const song = splitPath.at(-1).split(' ').splice(1).join(' ').split('.')[0]
-
-        return { artist, album, song }
-    }
-
-    static sortCoverAndSongs(paths){
+    static sortCoverAndSongs(files){
         let cover = ""
-        const songs = []
+        let songs = []
+        
+        files.forEach((file) => {
 
-        paths.forEach(path => {
-            const extName = path.split('.').at(-1)
-            if(extName === 'jpg'){
-                cover = path
-            }else if(['flac'].includes(extName)){
-                songs.push(path)
+            const extName = file.title.split('.').at(-1)
+            if(['flac'].includes(extName)){
+                songs.push(file)
+            }else if(extName === 'jpg'){
+                cover = file.title
             }
         })
 
         return { cover, songs }
-    }
-
-    static join(){
-        return Array.from(arguments).map(s => s[0] === "/" ? s.slice(1) : s).join('/')
     }
 
     calcTime(seconds){
@@ -143,10 +140,26 @@ class MusicPlayer{
         return `${min}:${returnedSec}`
     }
 
-    play(songPath = ""){
-        if(songPath){
-            this.audioEl.src = this.apiUrl ? this.apiUrl + songPath : songPath
-            this.showPlayingSongName(songPath)
+    makePrettyTitle(title){
+        title = title.split(".")
+        title.pop() // remove extension like .mp3 .flac etc
+        title = title.join()
+        title = title.replace("01-", "")
+        return title
+    }
+
+    play(song){
+        if(!song){
+            this.showPlayingSongName("No Song Selected")
+            return
+        }
+
+        if(song){
+            this.audioEl.src = song.songPath
+            console.log(song)
+            const title = this.makePrettyTitle(song.title)
+            this.showPlayingSongName(title)
+            this.highlightSongElement(song.element)
         }
 
         if(this.audioEl.src != ""){
@@ -155,6 +168,7 @@ class MusicPlayer{
                 this.playButtonEl.classList.replace("musicplayer-icon-play", "musicplayer-icon-pause")
             }
         }
+
     }
 
     pause(){
@@ -167,12 +181,18 @@ class MusicPlayer{
         this.coverImageEl.style.backgroundImage = `url("${code}")`
     }
 
-    loadPlaylist(paths){
-        this.playlist = MusicPlayer.sortCoverAndSongs(paths)
+    setAlbumCover(src){
+        this.coverImageEl.style.backgroundImage = `url("${src}")`
+    }
 
-        // this.setAlbumCoverBase64()
-
-        this.play(this.playlist.songs[0])
+    loadPlaylist(playlist){
+        if(playlist.cover){
+            this.setAlbumCover(playlist.cover)
+        }
+        
+        this.playlist = playlist
+        console.log(playlist.songs[0])
+        this.play(playlist.songs[0])
     }
 
     playNextSong(){
@@ -195,9 +215,8 @@ class MusicPlayer{
         this.play(nextSongPath)
     }
 
-    showPlayingSongName(fullSongPath){
-        const {artist, album, song} = MusicPlayer.extractArtistAlbumSongname(fullSongPath)
-        this.playingSongTextEl.textContent = `${artist} - ${song}`
+    showPlayingSongName(s){
+        this.playingSongTextEl.textContent = s.title || s
     }
 
     highlightSongElement(element){
@@ -211,7 +230,8 @@ class MusicPlayer{
         const selector = "musicplayer-highlight-album"
 
         Array.from(document.getElementsByClassName(selector)).forEach(e => e.classList.remove(selector))
-        element.classList.add(selector)
+        element.querySelector(".albumName").classList.add(selector)
+        element.querySelector(".albumSongs").classList.remove("hidden")
     }
 
     saveToLocalStorage(){
@@ -220,14 +240,14 @@ class MusicPlayer{
     }
 
     addServer(config){
-        // {url, token, musicListRoute, albumRoute}
-        this.serverList[config.url] = config
+        // {server, token, musicListRoute, albumRoute}
+        this.serverList[config.server] = config
 
         this.saveToLocalStorage()
     }
 
-    async getAlbumsFromServer(url){
-        const {token, musicListRoute} = this.serverList[url]
+    async getAlbumsFromServer(server){
+        const {token, musicListRoute, albumRoute} = this.serverList[server]
 
         const fetchConfig = {
             method: "GET",
@@ -238,47 +258,50 @@ class MusicPlayer{
             }
         }
 
-        const albums = await fetch(MusicPlayer.join(url, musicListRoute), fetchConfig).then(async (res) => await res.json())
+        const albums = await fetch(join(server, musicListRoute), fetchConfig).then(async (res) => await res.json())
 
-        this.serverList[url].albums = albums
+        const albumContents = await Promise.all(
+            albums.map(async (album) => fetch(
+                    encodeURI(join(server, albumRoute, album)), fetchConfig
+                ).then(async res => {
+                    const data = await res.json()
+                    return data.map(title => ({title}))
+                })
+            )
+        )
 
-        return albums
+        this.serverList[server].albums = albums.map((album, i) => {
+            const {cover, songs} = MusicPlayer.sortCoverAndSongs(albumContents[i])
+            return { album, cover, songs}
+        })
+
+        return albumContents
     }
 
     async getAlbumsFromAllServers(){
         const servers = Object.values(this.serverList)
-        const albumsFromServers = await Promise.all(servers.map(server => this.getAlbumsFromServer(server.url)))
-
-        for(let i = 0; i < servers.length; i++){
-            const {url} = servers[i]
-            const albums = albumsFromServers[i]
-            this.serverList[url].albums = albums
-        }
+        await Promise.all(servers.map(server => this.getAlbumsFromServer(server.server)))
 
         this.saveToLocalStorage()
     }
 
     getAlbums(){
         return Object.values(this.serverList).reduce((acc, v) => {
-            const {url, albums, albumRoute} = v
-            return [...acc, ...albums.map(album => ({url, album, albumRoute: MusicPlayer.join(albumRoute, album)}))]
+            const {server, albums, albumRoute, songRoute} = v
+
+            return [
+                ...acc,
+                ...albums.map(
+                    album => {
+                        const obj = {server, ...album, albumRoute: join(albumRoute, album.album), songRoute}
+                        return obj
+                    }
+                )
+            ]
         }, [])
     }
 
-    async getSongsFromAlbum(url, album){
-        const {token, albumRoute} = this.serverList[url]
-
-        const fetchConfig = {
-            method: "GET",
-            headers: {
-                Authorization: `Bearer ${token}`,
-                'Content-Type': 'application/json',
-                'Access-Control-Allow-Origin': "*"
-            }
-        }
-
-        const albums = await fetch(MusicPlayer.join(url, albumRoute, album), fetchConfig).then(async (res) => await res.json())
-
-        return albums
+    getToken(server){
+        return this.serverList[server].token
     }
 }
