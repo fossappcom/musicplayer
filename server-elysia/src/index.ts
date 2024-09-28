@@ -6,7 +6,7 @@ import { staticPlugin } from "@elysiajs/static"
 import { bearer } from "@elysiajs/bearer"
 import { cors } from "@elysiajs/cors"
 
-const MUSIC_FOLDER_PATH = "/home/user/SSD/Music"
+const MUSIC_FOLDER_PATH = "/music"
 
 const app = new Elysia()
     .use(cors({

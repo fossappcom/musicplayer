@@ -1,7 +1,7 @@
 services:
 
   server:
-    build: server
+    build: server-alysia
     restart: unless-stopped
     volumes:
       - music:/music
