@@ -93,12 +93,7 @@ export default class MusicPlayer{
             this.audioEl.addEventListener('ended', (e) => {
                 this.hooks?.onSongEnd(this)
                 
-                if(this.playlist.songs.length > this.playlistPlayingIndex){
-                    this.playlistPlayingIndex++
-                    const songIndex = this.playlistPlayingIndex
-                    const nextSongPath = this.playlist.songs[songIndex]
-                    this.play(nextSongPath)
-                }
+                this.playNextSong()
             })
 
             this.playNextEl?.addEventListener('click', () => this.playNextSong())
@@ -156,7 +151,6 @@ export default class MusicPlayer{
 
         if(song){
             this.audioEl.src = song.songPath
-            console.log(song)
             const title = this.makePrettyTitle(song.title)
             this.showPlayingSongName(title)
             this.highlightSongElement(song.element)
@@ -191,15 +185,15 @@ export default class MusicPlayer{
         }
         
         this.playlist = playlist
-        console.log(playlist.songs[0])
         this.play(playlist.songs[0])
     }
 
     playNextSong(){
-        if(this.playlist.songs.length-1 > this.playlistPlayingIndex){
-            this.playlistPlayingIndex++
+        if(this.playlistPlayingIndex >= this.playlist.songs.length-1){
+            return
         }
 
+        this.playlistPlayingIndex++
         const songIndex = this.playlistPlayingIndex
         const nextSongPath = this.playlist.songs[songIndex]
         this.play(nextSongPath)
@@ -239,9 +233,11 @@ export default class MusicPlayer{
         localStorage.setItem('serverList', serverListJson)
     }
 
-    addServer(config){
-        // {server, token, musicListRoute, albumRoute}
+    async addServer(config){
+        // {server, token, musicListRoute, albumRoute, songRoute}
         this.serverList[config.server] = config
+
+        await this.getAlbumsFromServer(config.server)
 
         this.saveToLocalStorage()
     }
@@ -272,7 +268,7 @@ export default class MusicPlayer{
 
         this.serverList[server].albums = albums.map((album, i) => {
             const {cover, songs} = MusicPlayer.sortCoverAndSongs(albumContents[i])
-            return { album, cover, songs}
+            return {album, cover, songs}
         })
 
         return albumContents

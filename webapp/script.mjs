@@ -42,9 +42,18 @@ document.getElementById('settings-save').addEventListener('click', async () => {
     const albumRoute = document.getElementById('api-album-route').value
     const songRoute = document.getElementById('api-song-route').value
 
-    musicPlayer.addServer({ server, token, musicListRoute, albumRoute, songRoute })
+    await musicPlayer.addServer({ server, token, musicListRoute, albumRoute, songRoute })
+
+    musicList.update()
+
+    settingsForm.classList.toggle("hidden")
 })
 
-musicPlayer.getAlbumsFromAllServers()
+async function main(){
+    await musicPlayer.getAlbumsFromAllServers()
 
-musicList.update()
+    musicList.update()
+}
+
+main()
+
