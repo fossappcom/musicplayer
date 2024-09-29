@@ -1,33 +1,47 @@
 import { readdir } from "node:fs/promises"
 import { join } from "node:path"
+import { parseArgs } from "util"
 
 import { Elysia } from "elysia"
 import { staticPlugin } from "@elysiajs/static"
 import { bearer } from "@elysiajs/bearer"
 import { cors } from "@elysiajs/cors"
 
-const MUSIC_FOLDER_PATH = "/music"
+const { values } = parseArgs({
+    args: Bun.argv,
+    options: {
+        MUSICFOLDER: {
+            type: "string"
+        },
+        port: {
+            type: "string"
+        }
+    },
+    allowPositionals: true
+})
+
+const { MUSICFOLDER, PORT } = Bun.env || values
 
 const app = new Elysia()
     .use(cors({
         origin: "*"
     }))
     .use(staticPlugin({
-        assets: MUSIC_FOLDER_PATH,
+        assets: MUSICFOLDER,
         prefix: "/song",
         enableDecodeURI: true
     }))
 
 app.get("/music", async () => {
-    const albums = await readdir(MUSIC_FOLDER_PATH)
+    const albums = await readdir(MUSICFOLDER)
     return albums
 })
 
 app.get("/album/:album", async ({params: {album}}) => {
-    const songs = await readdir(join(MUSIC_FOLDER_PATH, album))
+    const songs = await readdir(join(MUSICFOLDER, album))
     return songs.sort()
 } )
 
-app.listen(8080)
+app.listen(PORT)
 
 console.log(`🦊 Elysia is running at ${app.server?.hostname}:${app.server?.port}`)

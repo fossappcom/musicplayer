@@ -3,7 +3,9 @@
   "module": "index.ts",
   "type": "module",
   "scripts": {
-    "dev": "bun run --watch src/index.ts"
+    "dev": "bun run --watch src/index.ts",
+    "start": "bun run src/index.ts",
+    "pm2": "pm2 start 'bun run src/index.ts' --name musicplayer-server"
   },
   "devDependencies": {
     "@types/bun": "latest"
