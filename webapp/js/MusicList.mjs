@@ -27,7 +27,7 @@ export default class MusicList{
     addAlbum(data){
         data.songs = data.songs.map(song => {
             return {
-                ...song, songPath: join(data.server, data.songRoute, data.album, song.title)
+                ...song, songPath: join(data.server, data.songRoute, data.album, song._title)
             }
         })
             

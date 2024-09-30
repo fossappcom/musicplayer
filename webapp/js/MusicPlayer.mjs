@@ -94,11 +94,17 @@ export default class MusicPlayer{
                 this.hooks?.onSongEnd(this)
                 
                 this.playNextSong()
+
+                if(this.playlistPlayingIndex <= this.playlist.songs.length-1){
+                    this.pause()
+                }
             })
 
             this.playNextEl?.addEventListener('click', () => this.playNextSong())
-
             this.playPrevEl?.addEventListener('click', () => this.playPrevSong())
+
+            navigator.mediaSession.setActionHandler("nexttrack", () => this.playNextSong())
+            navigator.mediaSession.setActionHandler("previoustrack", () => this.playPrevSong())
     
             if(this.audioEl.readyState > 0){
                 this.songDurationEl.textContent = this.songDuration
@@ -117,11 +123,11 @@ export default class MusicPlayer{
         
         files.forEach((file) => {
 
-            const extName = file.title.split('.').at(-1)
+            const extName = file._title.split('.').at(-1)
             if(['flac'].includes(extName)){
                 songs.push(file)
             }else if(extName === 'jpg'){
-                cover = file.title
+                cover = file._title
             }
         })
 
@@ -135,12 +141,18 @@ export default class MusicPlayer{
         return `${min}:${returnedSec}`
     }
 
-    makePrettyTitle(title){
-        title = title.split(".")
-        title.pop() // remove extension like .mp3 .flac etc
-        title = title.join()
-        title = title.replace("01-", "")
-        return title
+    parseTitle(t){
+        t = t.split(".")
+        t.pop() // remove extension
+        t = t.join()
+        t = t.replace(/([0-9]+(-| ))+/, "")
+        return t
+    }
+
+    parseAlbum(t){
+        t = t.replace("-", " - ")
+        t = t.replace("_", " ")
+        return t
     }
 
     play(song){
@@ -151,8 +163,7 @@ export default class MusicPlayer{
 
         if(song){
             this.audioEl.src = song.songPath
-            const title = this.makePrettyTitle(song.title)
-            this.showPlayingSongName(title)
+            this.showPlayingSongName(song.title)
             this.highlightSongElement(song.element)
         }
 
@@ -167,7 +178,6 @@ export default class MusicPlayer{
 
     pause(){
         this.audioEl.pause()
-        this.isPlaying === false
         this.playButtonEl.classList.replace("musicplayer-icon-pause", "musicplayer-icon-play")
     }
 
@@ -209,8 +219,8 @@ export default class MusicPlayer{
         this.play(nextSongPath)
     }
 
-    showPlayingSongName(s){
-        this.playingSongTextEl.textContent = s.title || s
+    showPlayingSongName(song){
+        this.playingSongTextEl.textContent = song.title || song
     }
 
     highlightSongElement(element){
@@ -261,7 +271,9 @@ export default class MusicPlayer{
                     encodeURI(join(server, albumRoute, album)), fetchConfig
                 ).then(async res => {
                     const data = await res.json()
-                    return data.map(title => ({title}))
+                    return data.map(_title => (
+                        { _title, title: this.parseTitle(_title)}
+                    ))
                 })
             )
         )
@@ -300,4 +312,5 @@ export default class MusicPlayer{
     getToken(server){
         return this.serverList[server].token
     }
+
 }
