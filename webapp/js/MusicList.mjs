@@ -27,11 +27,11 @@ export default class MusicList{
     addAlbum(data){
         data.songs = data.songs.map(song => {
             return {
-                ...song, songPath: join(data.server, data.songRoute, data.album, song._title)
+                ...song, songPath: join(data.server, data.songRoute, data._album, song._title)
             }
         })
             
-        this.albums[data.album] = this.createAlbum(data)
+        this.albums[data._album] = this.createAlbum(data)
     }
 
     render(){
@@ -42,9 +42,9 @@ export default class MusicList{
         }
     }
 
-    createAlbum({server, album, albumRoute, songRoute, songs, cover}){
+    createAlbum({server, album, _album, albumRoute, songRoute, songs, cover}){
         const playButtonEl = $('button', {className: "icon-s musicplayer-icon-play pointer"})
-        playButtonEl.dataset.album = album
+        playButtonEl.dataset.album = _album
         playButtonEl.dataset.server = server
         playButtonEl.addEventListener("click", async (e) => {
             const {album} = e.target.dataset
@@ -76,7 +76,7 @@ export default class MusicList{
             server,
             route: join(server, albumRoute),
             songs,
-            cover: join(server, songRoute, album, cover)
+            cover: join(server, songRoute, _album, cover)
         }
     }
 

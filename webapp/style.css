@@ -68,11 +68,15 @@ body{
 
 #musicList .album .albumName{
     width: 100%;
+    font-size: 1.25em;
+    font-weight: 400;
+    letter-spacing: 0.3px;
 }
 
 #musicList .albumSongs{
     padding: 0.5em 0.5em 0.5em;
-    font-family: SatoshiItalic;
+    font-size: 1.1em;
+    letter-spacing: 0.3px;
 }
 
 #settings{

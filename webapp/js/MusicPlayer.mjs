@@ -301,7 +301,7 @@ export default class MusicPlayer{
                 ...acc,
                 ...albums.map(
                     album => {
-                        const obj = {server, ...album, albumRoute: join(albumRoute, album.album), songRoute}
+                        const obj = {server, ...album, albumRoute: join(albumRoute, album._album), songRoute}
                         return obj
                     }
                 )
