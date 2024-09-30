@@ -151,7 +151,7 @@ export default class MusicPlayer{
 
     parseAlbum(t){
         t = t.replace("-", " - ")
-        t = t.replace("_", " ")
+        t = t.replaceAll("_", " ")
         return t
     }
 
@@ -267,8 +267,8 @@ export default class MusicPlayer{
         const albums = await fetch(join(server, musicListRoute), fetchConfig).then(async (res) => await res.json())
 
         const albumContents = await Promise.all(
-            albums.map(async (album) => fetch(
-                    encodeURI(join(server, albumRoute, album)), fetchConfig
+            albums.map(async (_album) => fetch(
+                    encodeURI(join(server, albumRoute, _album)), fetchConfig
                 ).then(async res => {
                     const data = await res.json()
                     return data.map(_title => (
@@ -278,9 +278,9 @@ export default class MusicPlayer{
             )
         )
 
-        this.serverList[server].albums = albums.map((album, i) => {
+        this.serverList[server].albums = albums.map((_album, i) => {
             const {cover, songs} = MusicPlayer.sortCoverAndSongs(albumContents[i])
-            return {album, cover, songs}
+            return {_album, album: this.parseAlbum(_album), cover, songs}
         })
 
         return albumContents

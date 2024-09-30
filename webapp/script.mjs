@@ -53,6 +53,8 @@ async function main(){
     await musicPlayer.getAlbumsFromAllServers()
 
     musicList.update()
+
+    console.log(musicPlayer.serverList)
 }
 
 main()
