@@ -25,6 +25,12 @@ const musicList = new MusicList("#musicList", {
     },
     onPlayPlaylist: function(album){
         musicPlayer.highlightAlbumElement(album.element)
+        musicPlayer.setSongIndex(0)
+        musicPlayer.loadPlaylist(album)
+    },
+    onPlaySong: function(album, index){
+        musicPlayer.highlightAlbumElement(album.element)
+        musicPlayer.setSongIndex(index)
         musicPlayer.loadPlaylist(album)
     }
 })
@@ -53,8 +59,6 @@ async function main(){
     await musicPlayer.getAlbumsFromAllServers()
 
     musicList.update()
-
-    console.log(musicPlayer.serverList)
 }
 
 main()

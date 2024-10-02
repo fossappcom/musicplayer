@@ -95,8 +95,9 @@ export default class MusicPlayer{
                 
                 this.playNextSong()
 
-                if(this.playlistPlayingIndex <= this.playlist.songs.length-1){
-                    this.pause()
+                if(this.playlistPlayingIndex >= this.playlist.songs.length-1){
+                    this.playButtonEl.classList.replace("musicplayer-icon-pause", "musicplayer-icon-play")
+                    this.playlistPlayingIndex = 0
                 }
             })
 
@@ -156,24 +157,20 @@ export default class MusicPlayer{
     }
 
     play(song){
-        if(!song){
-            this.showPlayingSongName("No Song Selected")
-            return
-        }
-
         if(song){
             this.audioEl.src = song.songPath
             this.showPlayingSongName(song.title)
             this.highlightSongElement(song.element)
         }
 
-        if(this.audioEl.src != ""){
+        if(this.audioEl.src){
             this.audioEl.play()
             if(this.playButtonEl.classList.contains("musicplayer-icon-play")){
                 this.playButtonEl.classList.replace("musicplayer-icon-play", "musicplayer-icon-pause")
             }
+        }else if(!song){
+            this.showPlayingSongName("No Song Selected")
         }
-
     }
 
     pause(){
@@ -189,13 +186,17 @@ export default class MusicPlayer{
         this.coverImageEl.style.backgroundImage = `url("${src}")`
     }
 
+    setSongIndex(position){
+        this.playlistPlayingIndex = position
+    }
+
     loadPlaylist(playlist){
         if(playlist.cover){
             this.setAlbumCover(playlist.cover)
         }
         
         this.playlist = playlist
-        this.play(playlist.songs[0])
+        this.play(playlist.songs[this.playlistPlayingIndex])
     }
 
     playNextSong(){

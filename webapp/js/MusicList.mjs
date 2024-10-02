@@ -8,6 +8,7 @@ export default class MusicList{
 
         this.onUpdateHook = config.onUpdate
         this.onPlayPlaylistHook = config.onPlayPlaylist
+        this.onPlaySongHook = config.onPlaySong
     }
 
     update(){
@@ -66,7 +67,7 @@ export default class MusicList{
             songsListEl
         ])
 
-        songs = songs.map(obj => this.createSong(obj))
+        songs = songs.map((obj, i) => this.createSong(obj, i))
         
         songsListEl.append(...songs.map(s => s.element))
 
@@ -80,10 +81,14 @@ export default class MusicList{
         }
     }
 
-    createSong(data){
+    createSong(data, index){
         const songEl = $("div", {className: "song"}, data.title)
+        songEl.dataset.index = index
+
         songEl.addEventListener('click', (e) => {
-            this.onPlaySongHook()
+            const {album} = e.target.parentElement.parentElement.querySelector(".albumHeader button").dataset
+            const {index} = e.target.dataset
+            this.onPlaySongHook(this.albums[album], index)
         })
         return {...data, element: songEl}
     }
