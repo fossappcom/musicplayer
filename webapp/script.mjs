@@ -27,11 +27,13 @@ const musicList = new MusicList("#musicList", {
         musicPlayer.highlightAlbumElement(album.element)
         musicPlayer.setSongIndex(0)
         musicPlayer.loadPlaylist(album)
+        album.element.scrollIntoView({behavior: "smooth",block: "start"})
     },
     onPlaySong: function(album, index){
         musicPlayer.highlightAlbumElement(album.element)
         musicPlayer.setSongIndex(index)
         musicPlayer.loadPlaylist(album)
+        album.element.scrollIntoView({behavior: "smooth",block: "start"})
     }
 })
 

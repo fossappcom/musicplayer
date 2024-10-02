@@ -59,6 +59,7 @@ body{
     background-color: rgba(255,255,255,0.6);
     border-radius: 0.5em;
     box-shadow: 2px 2px 11px #000;
+    scroll-margin-top: 0.5em;
 }
 
 #musicList .album .albumHeader{
