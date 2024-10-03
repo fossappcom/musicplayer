@@ -156,10 +156,16 @@ export default class MusicPlayer{
         return t
     }
 
+    getArtist(t){
+        t = t.split("-")
+        t = t[0].replaceAll("_", " ")
+        return t
+    }
+
     play(song){
         if(song){
             this.audioEl.src = song.songPath
-            this.showPlayingSongName(song.title)
+            this.showPlayingSongName(`${song.artist} - ${song.title}`)
             this.highlightSongElement(song.element)
         }
 
@@ -273,7 +279,7 @@ export default class MusicPlayer{
                 ).then(async res => {
                     const data = await res.json()
                     return data.map(_title => (
-                        { _title, title: this.parseTitle(_title)}
+                        { _title, title: this.parseTitle(_title), artist: this.getArtist(_album)}
                     ))
                 })
             )
