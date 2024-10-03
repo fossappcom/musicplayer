@@ -10,10 +10,14 @@ import { cors } from "@elysiajs/cors"
 import Sharp from "sharp"
 
 function createNewCoverName(path: string){
-    console.log(path)
     let newPath = path.split(".")
     newPath[newPath.length-2] += "-mobile"
     return newPath.join(".")
+}
+
+function getCoverSize(coverSize: string){
+    const size = coverSize.split("x")
+    return [parseInt(size[0]), parseInt(size[1])]
 }
 
 const { values } = parseArgs({
@@ -29,7 +33,8 @@ const { values } = parseArgs({
     allowPositionals: true
 })
 
-const { MUSICFOLDER, PORT } = Bun.env || values
+const { MUSICFOLDER, PORT, COVERSIZE } = Bun.env || values
+const [COVER_W, COVER_H] = getCoverSize(COVERSIZE)
 
 const app = new Elysia()
     .use(cors({
@@ -51,7 +56,7 @@ app.get("/cover/:album/:cover", async ({params: {album, cover}}) => {
         return coverFile
     }else{
         await Sharp(coverPath)
-            .resize(600, 600)
+            .resize(COVER_W, COVER_H)
             .toFile(newCoverPath)
     }
     
