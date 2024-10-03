@@ -17,6 +17,7 @@
     "@elysiajs/bearer": "^1.1.2",
     "@elysiajs/cors": "^1.1.1",
     "@elysiajs/static": "^1.1.1",
-    "elysia": "^1.1.16"
+    "elysia": "^1.1.16",
+    "sharp": "^0.33.5"
   }
 }

@@ -77,7 +77,7 @@ export default class MusicList{
             server,
             route: join(server, albumRoute),
             songs,
-            cover: join(server, songRoute, _album, cover)
+            cover: join(server, '/cover', _album, cover)
         }
     }
 
