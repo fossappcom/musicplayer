@@ -1,3 +1,8 @@
+:root{
+    ---background: #002;
+    ---accents: aqua;
+}
+
 @font-face {
     font-family: "Satoshi";
     src: url("fonts/Satoshi_Complete/Fonts/TTF/Satoshi-Variable.ttf");
@@ -16,7 +21,7 @@ body{
 #container{
     height: 100vh;
     display: grid;
-    grid-template-rows: 1fr 1em 2em 5em;
+    grid-template-rows: 1fr 2em 2em 5em;
     grid-template-areas: "list" "songTimeSlider" "nowPlaying" "player";
     font-family: Satoshi;
 }
@@ -29,13 +34,30 @@ body{
     cursor: pointer;
 }
 
+#musicPlayer, #nowPlaying{
+    background-color: var(---background);
+}
+
+input[type="range"]{
+    appearance: none;
+    background: transparent;
+    cursor: pointer;
+    margin: 0;
+    background-color: var(---background);
+}
+
+input[type="range"]::-moz-range-track,
+input[type="range"]::-webkit-slider-runnable-track{
+    background-color: var(---accents);
+    height: 4px;
+}
+
 #musicPlayer{
     grid-area: player;
     width: 100%;
     height: 100%;
     display: grid;
     gap: 1em;
-    background-color: #fff;
     color: #eee;
     grid-template-areas: "controlsL controls controlsR";
     grid-template-columns: 1fr 15em 1fr;
@@ -59,7 +81,8 @@ body{
     background-color: rgba(255,255,255,0.8);
     border-radius: 0.5em;
     box-shadow: 2px 2px 11px #000;
-    scroll-margin-top: 0.5em;
+    scroll-margin-top: 1em;
+    backdrop-filter: blur(5px);
 }
 
 #musicList .album .albumHeader{
@@ -120,8 +143,8 @@ body{
 }
 
 #musicPlay{
-    width: 5em;
-    height: 5em;
+    width: 3.5em;
+    height: 3.5em;
 }
 
 #nowPlaying{
@@ -129,6 +152,9 @@ body{
     display: flex;
     justify-content: center;
     align-items: center;
+    color: var(---accents);
+    font-size: 1.25em;
+    font-weight: 400;
 }
 
 #settings{
@@ -142,12 +168,18 @@ body{
     border-bottom: 2px solid #151515;
 }
 
+#musicTimePlayed{
+    color: var(---accents);
+}
+
 #musicDuration{
-    border-top: 1px solid #000;
+    border-top: 1px solid var(---accents);
+    color: var(---accents)
 }
 
 #musicTimeSlider{
     grid-area: songTimeSlider;
+    padding: 0 1em;
 }
 
 /* icons */
@@ -158,8 +190,8 @@ body{
     background-size: contain;
     background-color: transparent;
     border: none;
-    width: 3em;
-    height: 3em;
+    width: 2em;
+    height: 2em;
 }
 
 .icon-s{
@@ -168,31 +200,35 @@ body{
     background-size: contain;
     background-color: transparent;
     border: none;
-    width: 24px;
-    height: 24px;
+    width: 1.5em;
+    height: 1.5em;
+}
+
+.icon-color{
+    filter: invert(42%) sepia(93%) saturate(1352%) hue-rotate(145deg) brightness(119%) contrast(119%);
 }
 
 .icon-prev{
-    background-image: url("icons/music/003-previous.png");
-}
-
-.icon-next{
-    background-image: url("icons/music/003-previous.png");
+    background-image: url("icons/svgrepo_com/forward2.svg");
     transform: scaleX(-1);
 }
 
+.icon-next{
+    background-image: url("icons/svgrepo_com/forward2.svg");
+}
+
 .icon-settings{
-    background-image: url("icons/settings.png");
+    background-image: url("icons/svgrepo_com/settings.svg");
 }
 
 /* musicplayer style */
 
 .musicplayer-icon-play{
-    background-image: url("icons/music/008-play button.png");
+    background-image: url("icons/svgrepo_com/play2.svg");
 }
 
 .musicplayer-icon-pause{
-    background-image: url("icons/music/007-pause button.png");
+    background-image: url("icons/svgrepo_com/pause2.svg");
 }
 
 .musicplayer-highlight-song, .musicplayer-highlight-album{
