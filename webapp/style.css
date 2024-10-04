@@ -77,17 +77,22 @@ input[type="range"]::-webkit-slider-runnable-track{
 #musicList .album{
     display: flex;
     flex-flow: column;
-    padding: 0.5em 1em;
-    background-color: rgba(255,255,255,0.8);
     border-radius: 0.5em;
     box-shadow: 2px 2px 11px #000;
     scroll-margin-top: 1em;
-    backdrop-filter: blur(5px);
 }
 
 #musicList .album .albumHeader{
     display: flex;
     justify-content: space-between;
+    align-items: center;
+    padding: 0.5em;
+    background-color: #002b;
+    border-radius: 0.5em 0.5em 0 0;
+}
+
+#musicList .album .albumHeader:not(.musicplayer-highlight-album){
+    border-radius: 0.5em;
 }
 
 #musicList .album .albumName{
@@ -95,12 +100,17 @@ input[type="range"]::-webkit-slider-runnable-track{
     font-size: 1.25em;
     font-weight: 400;
     letter-spacing: 0.3px;
+    color: var(---accents);
 }
 
 #musicList .albumSongs{
     padding: 0.5em 0.5em 0.5em;
     font-size: 1.1em;
     letter-spacing: 0.3px;
+    backdrop-filter: blur(5px);
+    background-color: rgba(255,255,255,0.8);
+    padding-left: 2em;
+    border-radius: 0 0 0.5em 0.5em;
 }
 
 #settings{
@@ -155,6 +165,7 @@ input[type="range"]::-webkit-slider-runnable-track{
     color: var(---accents);
     font-size: 1.25em;
     font-weight: 400;
+    text-shadow: var(---accents) 0px 0px 6px;
 }
 
 #settings{
@@ -225,12 +236,29 @@ input[type="range"]::-webkit-slider-runnable-track{
 
 .musicplayer-icon-play{
     background-image: url("icons/svgrepo_com/play2.svg");
+    filter: invert(42%) sepia(93%) saturate(1352%) hue-rotate(145deg) brightness(119%) contrast(119%);
 }
 
 .musicplayer-icon-pause{
     background-image: url("icons/svgrepo_com/pause2.svg");
+    filter: invert(42%) sepia(93%) saturate(1352%) hue-rotate(145deg) brightness(119%) contrast(119%);
 }
 
-.musicplayer-highlight-song, .musicplayer-highlight-album{
-    color: #afa;
+.musicplayer-highlight-song::before{
+    content: "→";
+    position: absolute;
+    left: 0.6em;
+    text-shadow: var(---accents) 0px 0px 6px;
+}
+
+.musicplayer-highlight-album{
+    border: 2px solid var(---accents);
+}
+
+.musicplayer-highlight-album .albumName{
+    text-shadow: var(---accents) 0px 0px 6px;
+}
+
+.musicplayer-highlight-album button{
+    filter: invert(42%) sepia(93%) saturate(1352%) hue-rotate(145deg) brightness(119%) contrast(119%);
 }

@@ -241,7 +241,7 @@ export default class MusicPlayer{
         const selector = "musicplayer-highlight-album"
 
         Array.from(document.getElementsByClassName(selector)).forEach(e => e.classList.remove(selector))
-        element.querySelector(".albumName").classList.add(selector)
+        element.querySelector(".albumHeader").classList.add(selector)
         element.querySelector(".albumSongs").classList.remove("hidden")
     }
 
