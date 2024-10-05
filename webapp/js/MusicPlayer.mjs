@@ -107,6 +107,8 @@ export default class MusicPlayer{
             if("mediaSession" in navigator){
                 navigator.mediaSession.setActionHandler("nexttrack", this.playNextSong)
                 navigator.mediaSession.setActionHandler("previoustrack", this.playPrevSong)
+                navigator.mediaSession.setActionHandler("play", () => this.play())
+                navigator.mediaSession.setActionHandler("pause", () => this.pause())
             }
     
             if(this.audioEl.readyState > 0){
