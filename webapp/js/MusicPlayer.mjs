@@ -104,8 +104,10 @@ export default class MusicPlayer{
             this.playNextEl?.addEventListener('click', () => this.playNextSong())
             this.playPrevEl?.addEventListener('click', () => this.playPrevSong())
 
-            navigator.mediaSession.setActionHandler("nexttrack", () => this.playNextSong())
-            navigator.mediaSession.setActionHandler("previoustrack", () => this.playPrevSong())
+            if("mediaSession" in navigator){
+                navigator.mediaSession.setActionHandler("nexttrack", this.playNextSong)
+                navigator.mediaSession.setActionHandler("previoustrack", this.playPrevSong)
+            }
     
             if(this.audioEl.readyState > 0){
                 this.songDurationEl.textContent = this.songDuration
@@ -164,16 +166,32 @@ export default class MusicPlayer{
 
     play(song){
         if(song){
-            this.audioEl.src = song.songPath
-            this.showPlayingSongName(`${song.artist} - ${song.title}`)
-            this.highlightSongElement(song.element)
+            const {artist, title, songPath, element} = song
+            const {album, cover} = this.playlist
+
+            this.audioEl.src = songPath
+            this.showPlayingSongName(`${artist} - ${title}`)
+            this.highlightSongElement(element)
+            
+
+            navigator.mediaSession.metadata = new MediaMetadata({
+                title,
+                artist,
+                album,
+                artwork: [
+                    {
+                        src: cover,
+                        sizes: "600x600",
+                        type: "image/jpg"
+                    }
+                ]
+            })
         }
 
         if(this.audioEl.src){
             this.audioEl.play()
-            if(this.playButtonEl.classList.contains("musicplayer-icon-play")){
-                this.playButtonEl.classList.replace("musicplayer-icon-play", "musicplayer-icon-pause")
-            }
+            navigator.mediaSession.playbackState = "playing"
+            this.playButtonEl.classList.replace("musicplayer-icon-play", "musicplayer-icon-pause")
         }else if(!song){
             this.showPlayingSongName("No Song Selected")
         }
@@ -181,6 +199,7 @@ export default class MusicPlayer{
 
     pause(){
         this.audioEl.pause()
+        navigator.mediaSession.playbackState = "paused"
         this.playButtonEl.classList.replace("musicplayer-icon-pause", "musicplayer-icon-play")
     }
 

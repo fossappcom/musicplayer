@@ -115,6 +115,15 @@ input[type="range"]::-webkit-slider-runnable-track{
 
 #settings{
     grid-area: settings;
+    z-index: 99;
+    position: absolute;
+    display: flex;
+    flex-flow: column;
+    bottom: 7em;
+    left: 0;
+    right: 0;
+    background-color: #fff;
+    border-bottom: 2px solid #151515;
 }
 
 .albumCover{
@@ -166,17 +175,6 @@ input[type="range"]::-webkit-slider-runnable-track{
     font-size: 1.25em;
     font-weight: 400;
     text-shadow: var(---accents) 0px 0px 6px;
-}
-
-#settings{
-    position: absolute;
-    display: flex;
-    flex-flow: column;
-    bottom: 7em;
-    left: 0;
-    right: 0;
-    background-color: #fff;
-    border-bottom: 2px solid #151515;
 }
 
 #musicTimePlayed{
