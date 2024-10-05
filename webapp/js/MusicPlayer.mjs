@@ -103,13 +103,6 @@ export default class MusicPlayer{
 
             this.playNextEl?.addEventListener('click', () => this.playNextSong())
             this.playPrevEl?.addEventListener('click', () => this.playPrevSong())
-
-            if("mediaSession" in navigator){
-                navigator.mediaSession.setActionHandler("nexttrack", this.playNextSong)
-                navigator.mediaSession.setActionHandler("previoustrack", this.playPrevSong)
-                navigator.mediaSession.setActionHandler("play", () => this.play())
-                navigator.mediaSession.setActionHandler("pause", () => this.pause())
-            }
     
             if(this.audioEl.readyState > 0){
                 this.songDurationEl.textContent = this.songDuration

@@ -2,6 +2,69 @@ import {$, join} from "./js/utils.mjs"
 import MusicPlayer from "./js/MusicPlayer.mjs"
 import MusicList from "./js/MusicList.mjs"
 
+// const musicPlayer = new MusicPlayer({
+//     elements: {
+//         audio: '#musicAudio',
+//         songDuration: '#musicDuration',
+//         timeSlider: '#musicTimeSlider',
+//         timePlayed: '#musicTimePlayed',
+//         volumeSlider: '#musicVolume',
+//         volumeText: '#musicVolumeText',
+//         playButton: '#musicPlay',
+//         muteButton: '#musicMute',
+//         playNextSongButton: '#musicPlayNext',
+//         playPrevSongButton: '#musicPlayPrev',
+//         playingSongText: '#nowPlaying',
+//         coverImage: '#musicList'
+//     }
+// })
+
+// const musicList = new MusicList("#musicList", {
+//     onUpdate: () => {
+//         return musicPlayer.getAlbums()
+//     },
+//     onPlayPlaylist: function(album){
+//         musicPlayer.highlightAlbumElement(album.element)
+//         musicPlayer.setSongIndex(0)
+//         musicPlayer.loadPlaylist(album)
+//         album.element.scrollIntoView({behavior: "smooth",block: "start"})
+//     },
+//     onPlaySong: function(album, index){
+//         musicPlayer.highlightAlbumElement(album.element)
+//         musicPlayer.setSongIndex(index)
+//         musicPlayer.loadPlaylist(album)
+//         album.element.scrollIntoView({behavior: "smooth",block: "start"})
+//     }
+// })
+
+// const settingsForm = document.getElementById('settings')
+
+// document.getElementById('settingsBtn').addEventListener('click', () => {
+//     settingsForm.classList.toggle('hidden')
+// })
+
+// document.getElementById('settings-save').addEventListener('click', async () => {
+//     const token = document.getElementById('api-key').value
+//     const server = document.getElementById('api-url').value
+//     const musicListRoute = document.getElementById('api-music-route').value
+//     const albumRoute = document.getElementById('api-album-route').value
+//     const songRoute = document.getElementById('api-song-route').value
+
+//     await musicPlayer.addServer({ server, token, musicListRoute, albumRoute, songRoute })
+
+//     musicList.update()
+
+//     settingsForm.classList.toggle("hidden")
+// })
+
+// async function main(){
+//     await musicPlayer.getAlbumsFromAllServers()
+
+//     musicList.update()
+// }
+
+// main()
+
 const musicPlayer = new MusicPlayer({
     elements: {
         audio: '#musicAudio',
@@ -19,49 +82,11 @@ const musicPlayer = new MusicPlayer({
     }
 })
 
-const musicList = new MusicList("#musicList", {
-    onUpdate: () => {
-        return musicPlayer.getAlbums()
-    },
-    onPlayPlaylist: function(album){
-        musicPlayer.highlightAlbumElement(album.element)
-        musicPlayer.setSongIndex(0)
-        musicPlayer.loadPlaylist(album)
-        album.element.scrollIntoView({behavior: "smooth",block: "start"})
-    },
-    onPlaySong: function(album, index){
-        musicPlayer.highlightAlbumElement(album.element)
-        musicPlayer.setSongIndex(index)
-        musicPlayer.loadPlaylist(album)
-        album.element.scrollIntoView({behavior: "smooth",block: "start"})
-    }
-})
-
-const settingsForm = document.getElementById('settings')
-
-document.getElementById('settingsBtn').addEventListener('click', () => {
-    settingsForm.classList.toggle('hidden')
-})
-
-document.getElementById('settings-save').addEventListener('click', async () => {
-    const token = document.getElementById('api-key').value
-    const server = document.getElementById('api-url').value
-    const musicListRoute = document.getElementById('api-music-route').value
-    const albumRoute = document.getElementById('api-album-route').value
-    const songRoute = document.getElementById('api-song-route').value
-
-    await musicPlayer.addServer({ server, token, musicListRoute, albumRoute, songRoute })
-
-    musicList.update()
-
-    settingsForm.classList.toggle("hidden")
-})
-
-async function main(){
-    await musicPlayer.getAlbumsFromAllServers()
-
-    musicList.update()
+if("mediaSession" in navigator){
+    navigator.mediaSession.setActionHandler("nexttrack", () => this.playNextSong())
+    navigator.mediaSession.setActionHandler("previoustrack", () => this.playPrevSong())
+    navigator.mediaSession.setActionHandler("play", () => this.play({
+        songPath: "https://diviextended.com/wp-content/uploads/2021/10/sound-of-waves-marine-drive-mumbai.mp3"
+    }))
+    navigator.mediaSession.setActionHandler("pause", () => this.pause())
 }
-
-main()
-
